@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="elinor",
-    version="0.0.2",
+    version="0.0.4",
     author="Dashvvood",
     author_email="mathismottis@gmail.com",
     description="some util functions",
@@ -13,5 +13,6 @@ setup(
         "matplotlib",
         "pybase64",
         "pyyaml",
+        "pandas",
     ],
 )
