@@ -54,7 +54,7 @@ class BaseDatasetPhoenix2014T(object):
 
     def __len__(self):
         return len(self.metadata)
-    
+
 
     def __getitem__(self, index):
         metadata = self.metadata.iloc[index]
