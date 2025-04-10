@@ -1,15 +1,13 @@
 # TODO:
 import os
-from pathlib import Path
 import pandas as pd
 from typing import List, Generator
 from elinor import count_files_by_end
-import re
 from PIL import Image
 # from dataclasses import dataclass
 from dataclasses import dataclass
 from string import Template
-
+from tqdm import tqdm
 
 @dataclass
 class BaseDatasetPhoenix2014TItem:
@@ -56,9 +54,9 @@ class BaseDatasetPhoenix2014T(object):
         return len(self.metadata)
 
 
-    def __getitem__(self, index):
+    def __getitem__(self, index, path=False):
         metadata = self.metadata.iloc[index]
-        frames = self.get_frames_by_dirname(metadata.dirname)
+        frames = self.get_paths_by_dirname(metadata.dirname) if path else self.get_frames_by_dirname(metadata.dirname)
         num = self.metadata.iloc[index].num
 
         return BaseDatasetPhoenix2014TItem(
@@ -89,3 +87,13 @@ class BaseDatasetPhoenix2014T(object):
         for i in range(frame_num):
             frame_path = os.path.join(video_path, TemplateFrame.substitute(frame=f"{i+1:04d}"))
             yield Image.open(frame_path)
+
+
+    def get_paths_by_dirname(self, dirname) -> Generator:
+        video_path = os.path.join(self.features_dir, dirname)
+        frame_num = self.metadata[self.metadata["dirname"] == dirname].num.item()
+        for i in range(frame_num):
+            frame_path = os.path.join(video_path, TemplateFrame.substitute(frame=f"{i+1:04d}"))
+            yield frame_path
+
+            
