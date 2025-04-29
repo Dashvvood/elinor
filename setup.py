@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="elinor",
-    version="0.0.4",
+    version="0.0.6",
     author="Dashvvood",
     author_email="mathismottis@gmail.com",
     description="some util functions",
@@ -14,5 +14,6 @@ setup(
         "pybase64",
         "pyyaml",
         "pandas",
+        "dotenv",
     ],
 )
