@@ -4,20 +4,17 @@ from typing import List
 from dotenv import load_dotenv
 from types import SimpleNamespace
 
+from deprecated import deprecated
+
+@deprecated(reason="this fn cannot get the right env vars")
 def fast_loadenv_then_append_path(vars:List[str] = ["PROJECT_ROOT"]):
-    load_dotenv()
+    load_res = load_dotenv()
+    print(f"load env: {load_res}")
     ns = SimpleNamespace(**{k: None for k in vars}) 
 
     for var in vars:
-        if var in os.environ:
-            path = os.environ[var]
-            ns.__setattr__(var, path)
-            if os.path.exists(path):
-                sys.path.append(path)
-            else:
-                raise FileNotFoundError(f"Path {path} does not exist.")
-        else:
-            raise KeyError(f"Environment variable {var} not found.")
-        
+        path = os.getenv(var)
+        ns.__setattr__(var, path)
+        sys.path.append(path)
     return ns
 
