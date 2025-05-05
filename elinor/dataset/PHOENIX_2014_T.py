@@ -12,6 +12,7 @@ from tqdm import tqdm
 @dataclass
 class BaseDatasetPhoenix2014TItem:
     frames: Generator
+    paths: List[str]
     num: int
     orth: str
     translation: str
@@ -54,13 +55,15 @@ class BaseDatasetPhoenix2014T(object):
         return len(self.metadata)
 
 
-    def __getitem__(self, index, path=False):
+    def __getitem__(self, index):
         metadata = self.metadata.iloc[index]
-        frames = self.get_paths_by_dirname(metadata.dirname) if path else self.get_frames_by_dirname(metadata.dirname)
+        frames =  self.get_frames_by_dirname(metadata.dirname)
+        paths = self.get_paths_by_dirname(metadata.dirname)
         num = self.metadata.iloc[index].num
 
         return BaseDatasetPhoenix2014TItem(
             frames=frames,
+            paths=paths,
             num=num,
             orth=metadata.orth,
             translation=metadata.translation
@@ -84,16 +87,19 @@ class BaseDatasetPhoenix2014T(object):
     def get_frames_by_dirname(self, dirname) -> Generator:
         video_path = os.path.join(self.features_dir, dirname)
         frame_num = self.metadata[self.metadata["dirname"] == dirname].num.item()
+        frames = [""] * frame_num
         for i in range(frame_num):
             frame_path = os.path.join(video_path, TemplateFrame.substitute(frame=f"{i+1:04d}"))
-            yield Image.open(frame_path)
-
+            frames[i] = Image.open(frame_path)
+        return frames
 
     def get_paths_by_dirname(self, dirname) -> Generator:
         video_path = os.path.join(self.features_dir, dirname)
         frame_num = self.metadata[self.metadata["dirname"] == dirname].num.item()
+        paths = [""] * frame_num
         for i in range(frame_num):
             frame_path = os.path.join(video_path, TemplateFrame.substitute(frame=f"{i+1:04d}"))
-            yield frame_path
+            paths[i] = frame_path
+        return paths
 
             
