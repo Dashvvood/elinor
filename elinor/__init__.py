@@ -6,7 +6,6 @@ from .loanlib import fast_loadenv_then_append_path
 
 
 def whoami():
-    import requests
     
     """
     Who am I?
