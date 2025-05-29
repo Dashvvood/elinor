@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="elinor",
-    version="0.0.14",
+    version="0.0.15",
     author="Dashvvood",
     author_email="mathismottis@gmail.com",
     description="some util functions",
