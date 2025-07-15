@@ -1,5 +1,4 @@
 import requests
-import regex  # 第三方库，性能更强
 import re
 from bs4 import BeautifulSoup
 import json
@@ -11,11 +10,11 @@ def get_video_id_from_url(url):
     match = re.search(pattern, url)
     return match.group(1) if match else None
 
-
 # deprecated: 放弃纯正则匹配, 容易受到转义字符干扰, 改为使用 json 解析更加准确
 # 改良版在get_youtube_title_by_url
 @deprecated(reason="Use get_youtube_title_by_url instead")
 def _get_youtube_title_by_url(url):
+    import regex  # 第三方库，性能更强
     TITLE_PATTERN = regex.compile(r'"playerOverlayVideoDetailsRenderer":\{"title":\{"simpleText":"(.*?)"')
     try:
         response = requests.get(url, timeout=(30, 60))  # 设置连接和读取超时
