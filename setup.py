@@ -2,24 +2,23 @@ from setuptools import find_packages, setup
 
 setup(
     name="elinor",
-    version="0.0.16",
+    version="0.0.17",
     author="Dashvvood",
     author_email="mathismottis@gmail.com",
     description="some util functions",
     packages=find_packages(),
     install_requires=[
         "numpy",
-        "pillow",
-        "matplotlib",
-        "pybase64",
-        "pyyaml",
-        "pandas",
+        "tqdm"
         "dotenv",
         "deprecated",
     ],
     extra_require={
         "dev": [
-            "tqdm",
+            "pybase64",
+            "pillow",
+            "pandas",
+            "pyyaml",
         ]
     }
 )
