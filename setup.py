@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="elinor",
-    version="0.0.18",
+    version="0.0.19",
     author="Dashvvood",
     author_email="mathismottis@gmail.com",
     description="some util functions",
@@ -23,6 +23,7 @@ setup(
             "requests",
             "regex",
             "rapidfuzz",
+            "ffmpeg-python"
         ]
     }
 )
