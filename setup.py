@@ -17,4 +17,9 @@ setup(
         "dotenv",
         "deprecated",
     ],
+    extra_require={
+        "dev": [
+            "tqdm",
+        ]
+    }
 )
