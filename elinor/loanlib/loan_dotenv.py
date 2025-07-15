@@ -3,10 +3,8 @@ import sys
 from typing import List
 from dotenv import load_dotenv, find_dotenv, dotenv_values
 from types import SimpleNamespace
-
 from deprecated import deprecated
 
-# @deprecated(reason="this fn cannot get the right env vars")
 def fast_loadenv_then_append_path(keys:List[str]=["PROJECT_ROOT"], verbose=False) -> SimpleNamespace:
 
     env_path = find_dotenv(usecwd=True)
