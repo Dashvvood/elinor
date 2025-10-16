@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from .timer import timer
 
 def o_d(td:int=0, tz:timezone=None):
     if tz is not None:
