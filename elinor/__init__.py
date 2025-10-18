@@ -7,8 +7,9 @@ _LAZY_SUBMODULES = ['ai', 'cv', 'data', 'dataset', 'loanlib']
 # 需要在顶层暴露的函数映射：顶层名字 -> (子模块名, 子模块内函数名)
 _EXPOSED_FUNCS = {
     'fast_loadenv_then_append_path': ('loanlib', 'fast_loadenv_then_append_path'),
-    'o_d': ('misc', 'o_d'),
-
+    'o_d': ('misc.timer', 'o_d'),
+    'O_D': ('misc.timer', 'O_D'),
+    'timer': ('misc.timer', 'timer'),
     # 如果以后想暴露更多函数，继续添加
     # 'other_func': ('loanlib', 'other_func'),
 }
