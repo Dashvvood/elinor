@@ -3,6 +3,59 @@ import functools
 import asyncio
 from typing import Callable, Any
 
+from datetime import datetime, timezone, timedelta
+from functools import wraps
+
+def memoize_first_call_with_reset(func):
+    cached_result = None
+    has_been_called = False
+    
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        nonlocal cached_result, has_been_called
+        
+        # 检查是否需要重置缓存
+        reset = kwargs.pop('_reset', False)
+        if reset:
+            cached_result = None
+            has_been_called = False
+        
+        if not has_been_called:
+            cached_result = func(*args, **kwargs)
+            has_been_called = True
+        
+        return cached_result
+    
+    # 添加重置方法
+    def reset():
+        nonlocal cached_result, has_been_called
+        cached_result = None
+        has_been_called = False
+        
+    wrapper.reset = reset
+    return wrapper
+
+@memoize_first_call_with_reset
+def O_D (td: int = 0, tz: timezone = None):
+    if tz is not None:
+        return datetime.now(tz)
+    if td != 0:
+        tz = timezone(timedelta(hours=td))
+        return datetime.now(tz)
+    now = datetime.now()
+    return now.astimezone()
+
+
+def o_d(td:int=0, tz:timezone=None):
+    if tz is not None:
+        return datetime.now(tz)
+    if td !=0:
+        tz = timezone(datetime.timedelta(hours=td))
+        return datetime.now(tz)
+    now = datetime.now()
+    return now.astimezone()
+
+
 def timer(func: Callable) -> Callable:
     """
     极简版计时装饰器，支持同步和异步函数
