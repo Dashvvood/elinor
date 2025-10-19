@@ -8,7 +8,7 @@ from .youtube import (
     get_youtube_title_by_oembed_batch,
     get_youtube_info_by_oembed_batch
 )
-from  parser import (
+from .parser import (
     parse_json,
     parse_output,
     parse_mark
