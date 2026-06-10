@@ -13,3 +13,7 @@ from .parser import (
     parse_output,
     parse_mark
 )
+from .pil_str import (
+    pil_to_b64, 
+    b64_to_pil,
+)

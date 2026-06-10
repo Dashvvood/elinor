@@ -1,5 +1,15 @@
-from collections import defaultdict, OrderedDict, namedtuple, Counter
+"""
+CN:
+这是一个用于总结模型结构和参数的工具。代码非常孱弱， 是当初为了了解模型结构和参数而写的。
+EN:
+This is a tool for summarizing model structures and parameters. 
+The code is very weak, and was written at the time to understand 
+the model structure and parameters.
+"""
+from collections import defaultdict, OrderedDict, namedtuple
+import os
 import uuid
+import torch
 
 def get_input_output_per_layer(model, model_input):
     features = OrderedDict()
@@ -27,7 +37,7 @@ def get_mapping_f2p(features, parameters):
     Get a mapping from feature to parameter.
     """
     def get_main_key(key):
-        return key.rsplit(".", 1)[0]  # 删除最后一个 '.' 后的部分（即 .weight, .bias）
+        return key.rsplit(".", 1)[0]  # 删除最后一个 '.'后的部分（即 .weight, .bias）
 
     # 建立映射关系
     mapping = defaultdict(list)
@@ -39,23 +49,45 @@ def get_mapping_f2p(features, parameters):
         
     return mapping
 
-def summary(model, model_input):
+def summary(model, model_input, output_path=None):
+    from .. import o_d
+
+    if output_path is None:
+        output_path = "output"
+
+    if os.path.isdir(output_path) or output_path.endswith((os.sep, "/")):
+        os.makedirs(output_path, exist_ok=True)
+        output_path = os.path.join(
+            output_path.rstrip(os.sep),
+            f"summary_{o_d().strftime('%Y%m%d%H%M%S')}.txt",
+        )
+    else:
+        parent = os.path.dirname(output_path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+
+    fp = open(output_path, "w")
+
+
     features = get_input_output_per_layer(model, model_input)
     parameters = {}
     for k, v in model.named_parameters():
         parameters[k] = v
     mapping = get_mapping_f2p(features, parameters)
 
-    uuid.uuid4()
-    fp = open(f"summary_{uuid.uuid4().hex}.txt", "w")
-
+    
     fp.write("Model: " + type(model).__name__ + "\n")
     fp.write("Input: " + str(model_input.keys()) + "\n")
     fp.write("=" * 80 + "\n")
 
     for f_key, io_data in features.items():
-        input_shape = io_data.input[0].shape if len(io_data.input) > 0 else None
-        output_shape = io_data.output[0].shape if len(io_data.output) > 0 else None
+        
+        input_shape = io_data.input[0].shape \
+            if len(io_data.input) > 0 else None
+
+        output_shape = io_data.output[0].shape \
+            if len(io_data.output) > 0 else None
+
         module_type = io_data.type.__name__
         fp.write(f"{f_key}: --- {module_type}\n")
         fp.write(" " * 4 + f">>> {input_shape} --> {output_shape}\n")
@@ -68,17 +100,3 @@ def summary(model, model_input):
     fp.close()
     
     return features, parameters, mapping
-
-
-if __name__ == '__main__':
-    from diffusers import UNet2DModel
-    import torch
-    
-    model = UNet2DModel()
-    model_input = {
-        "sample": torch.randn(1, 3, 64, 64),
-        "timestep": 1,
-    }
-    
-    summary(model, model_input)
-        

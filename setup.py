@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="elinor",
-    version="0.0.23",
+    version="0.0.24",
     author="Dashvvood",
     author_email="mathismottis@gmail.com",
     description="some util functions",
@@ -12,6 +12,7 @@ setup(
         "tqdm",
         "dotenv",
         "deprecated",
+        "pytest",
     ],
     extra_require={
         "dev": [
