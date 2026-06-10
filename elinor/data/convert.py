@@ -9,12 +9,14 @@ from timeit import default_timer as timer
 import csv
 
 
-def timeit(func):
+def timeit(func, precision=2):
     def wrapper(*args, **kwargs):
         start = timer()
         result = func(*args, **kwargs)
         end = timer()
-        logging.info(f"Function {func.__name__} took {end - start:.2f} seconds")
+        logging.info(
+            f"Function {func.__name__} took {end - start:.{precision}f} seconds"
+        )
         return result
     return wrapper
 
@@ -58,12 +60,12 @@ def convert_videos_in_folder(input_folder, output_folder, cmd='ffmpeg'):
             output_audio = os.path.join(output_folder, f"{os.path.splitext(filename)[0]}.mp3")
             files.append((input_video, output_audio, cmd))
     
-    max_workers = os.cpu_count() * 2 if os.cpu_count() else 4
+    max_workers = os.cpu_count() * 2 if os.cpu_count() else 2
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(convert_mp4_to_mp3, *file) for file in files]
         for future in futures:
-            result = future.result()
+            _ = future.result()
 
 
 def ffprobe_get_duration(input_video, cmd='ffprobe'):
