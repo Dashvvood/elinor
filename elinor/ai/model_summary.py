@@ -7,6 +7,7 @@ The code is very weak, and was written at the time to understand
 the model structure and parameters.
 """
 from collections import defaultdict, OrderedDict, namedtuple
+import io
 import os
 import uuid
 import torch
@@ -53,7 +54,7 @@ def summary(model, model_input, output_path=None):
     from .. import o_d
 
     if output_path is None:
-        output_path = "output"
+        output_path = "model_summary"
 
     if os.path.isdir(output_path) or output_path.endswith((os.sep, "/")):
         os.makedirs(output_path, exist_ok=True)
@@ -66,8 +67,7 @@ def summary(model, model_input, output_path=None):
         if parent:
             os.makedirs(parent, exist_ok=True)
 
-    fp = open(output_path, "w")
-
+    buf = io.StringIO()
 
     features = get_input_output_per_layer(model, model_input)
     parameters = {}
@@ -75,28 +75,44 @@ def summary(model, model_input, output_path=None):
         parameters[k] = v
     mapping = get_mapping_f2p(features, parameters)
 
-    
-    fp.write("Model: " + type(model).__name__ + "\n")
-    fp.write("Input: " + str(model_input.keys()) + "\n")
-    fp.write("=" * 80 + "\n")
-
+    header = [
+        "Model: " + type(model).__name__,
+        "Input: " + str(model_input.keys()),
+    ]
+    sections = []
     for f_key, io_data in features.items():
-        
-        input_shape = io_data.input[0].shape \
+        input_shape = [*io_data.input[0].shape] \
             if len(io_data.input) > 0 else None
 
-        output_shape = io_data.output[0].shape \
+        output_shape = [*io_data.output[0].shape] \
             if len(io_data.output) > 0 else None
 
         module_type = io_data.type.__name__
-        fp.write(f"{f_key}: --- {module_type}\n")
-        fp.write(" " * 4 + f">>> {input_shape} --> {output_shape}\n")
-        
+        section = [
+            f"{f_key}: --- {module_type}",
+            " " * 4 + f"I/O: {input_shape} --> {output_shape}",
+        ]
         for p_key in mapping[f_key]:
-            fp.write(" "*4 + f"{p_key}: {parameters[p_key].shape}\n")
-            
-        fp.write("-" * 80 + "\n")
-    fp.write("=" * 80 + "\n")
-    fp.close()
-    
+            section.append(
+                " "*4 
+                + f"{p_key}: {[*parameters[p_key].shape]}"
+                + " " * 1
+                + f"<{str(parameters[p_key].dtype).removeprefix("torch.")}>"
+            )
+        sections.append(section)
+
+    # all_lines = header + [line for section in sections for line in section]
+    all_lines = [line for section in sections for line in section]
+    sep_len = max(80, max(map(len, all_lines), default=0))
+
+    buf.write("\n".join(header) + "\n")
+    buf.write("=" * sep_len + "\n")
+    for section in sections:
+        buf.write("\n".join(section) + "\n")
+        buf.write("-" * sep_len + "\n")
+    buf.write("=" * sep_len + "\n")
+
+    with open(output_path, "w") as fp:
+        fp.write(buf.getvalue())
+
     return features, parameters, mapping
